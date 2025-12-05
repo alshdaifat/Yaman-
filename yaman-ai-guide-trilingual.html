@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>YamanAi – KI-Assistent (DE/EN/AR)</title>
+<style>
+:root {
+  --primary: #667eea;
+  --secondary: #48bb78;
+  --warning: #ed8936;
+  --danger: #f56565;
+  --light: #f7fafc;
+  --dark: #1a202c;
+  --yellow: #ffd700;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.7;
+  color: var(--dark);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.de, .en, .ar { display: none; }
+body.show-de .de { display: block; }
+body.show-en .en { display: block; }
+body.show-ar .ar { display: block; }
+body.show-ar { direction: rtl; }
+.lang-toggle {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.lang-btn {
+  padding: 10px 25px;
+  border: 2px solid var(--primary);
+  background: white;
+  color: var(--primary);
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.lang-btn.active, .lang-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+.hero {
+  text-align: center;
+  padding: 50px 28px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.hero h1 { font-size: 2.5rem; margin-bottom: 12px; }
+.hero .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 25px; }
+.prompt-generator {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 25px 0;
+}
+.prompt-generator h3 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+.prompt-generator label {
+  color: #a0aec0;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.prompt-generator textarea,
+.prompt-generator select {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  background: #2d3748;
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  font-family: inherit;
+}
+.prompt-generator textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.generate-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, #805ad5 100%);
+  color: white;
+  border: none;
+  padding: 16px 35px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+.generate-btn:hover {
+  transform: translateY(-2px);
+}
+.prompt-output {
+  display: none;
+  margin-top: 25px;
+}
+.prompt-output.visible { display: block; }
+.prompt-result-box {
+  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+  border: 4px solid var(--yellow);
+  border-radius: 12px;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(255,215,0,0.3);
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+  50% { box-shadow: 0 0 40px rgba(255,215,0,0.5); }
+}
+.prompt-result-box::before {
+  content: "★ ★ ★";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--yellow);
+  color: #9b2c2c;
+  padding: 4px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+.prompt-result-text {
+  color: white;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-prompt-btn {
+  position: sticky;
+  top: 20px;
+  background: var(--yellow);
+  color: #1a202c;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px auto;
+  font-size: 1rem;
+  transition: all 0.2s;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.copy-prompt-btn:hover {
+  background: #f6e05e;
+  transform: scale(1.02);
+}
+.copy-timestamp {
+  font-size: 0.8rem;
+  color: #4a5568;
+  display: block;
+  text-align: center;
+  margin-top: 8px;
+}
+.ai-recommendation {
+  background: #2d3748;
+  border-radius: 8px;
+  padding: 18px;
+  margin-top: 20px;
+  color: white;
+}
+.ai-recommendation h4 {
+  color: var(--yellow);
+  margin-bottom: 12px;
+}
+.ai-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  transition: transform 0.2s;
+}
+.ai-badge:hover { transform: scale(1.05); }
+.ai-badge.recommended {
+  background: var(--secondary);
+}
+.ai-badge.alternative {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+.info-box {
+  background: #ebf8ff;
+  border-left: 4px solid var(--primary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+.quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 15px;
+  background: var(--light);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--dark);
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+.quick-link:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.quick-link .icon { font-size: 2rem; margin-bottom: 10px; }
+.quick-link span { font-weight: 600; text-align: center; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.feature-card {
+  background: var(--light);
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s;
+}
+.feature-card:hover { transform: translateY(-3px); }
+.feature-card h4 { color: var(--primary); margin-bottom: 12px; }
+.icon { font-size: 2.2rem; margin-bottom: 12px; }
+h2 {
+  color: #5a67d8;
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  font-size: 1.6rem;
+}
+footer {
+  text-align: center;
+  padding: 25px;
+  color: white;
+  font-size: 0.95rem;
+  margin-top: 25px;
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body class="show-de">
+<div class="container">
+
+<div class="card hero">
+  <h1>⚡ YamanAi</h1>
+  <p class="subtitle de">Dein KI-Assistent für Elektroingenieure 💜</p>
+  <p class="subtitle en">Your AI Assistant for Electrical Engineers 💜</p>
+  <p class="subtitle ar">مساعد الذكاء الاصطناعي للمهندسين الكهربائيين 💜</p>
+  
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('de', event)">🇩🇪 Deutsch</button>
+    <button class="lang-btn" onclick="setLang('en', event)">🇬🇧 English</button>
+    <button class="lang-btn" onclick="setLang('ar', event)">🇸�� العربية</button>
+  </div>
+</div>
+
+<section class="card" id="generator">
+  <h2 class="de">🎯 Intelligenter Prompt Generator</h2>
+  <h2 class="en">🎯 Intelligent Prompt Generator</h2>
+  <h2 class="ar">🎯 مولد المطالبات الذكي</h2>
+  
+  <div class="info-box">
+    <h4 class="de">🧠 Wichtig: KI ist KEIN Mensch!</h4>
+    <h4 class="en">🧠 Important: AI is NOT human!</h4>
+    <h4 class="ar">🧠 هام: الذكاء الاصطناعي ليس إنساناً!</h4>
+    
+    <div class="de">
+      <p style="margin:15px 0;">KI ist eine <strong>Reihe von Arbeitsanweisungen</strong>. Stell dir vor:</p>
+      <p style="margin:15px 0; padding:15px; background:white; border-radius:8px;">
+        <strong>Das Wald-Experiment:</strong> Wenn ich sage "Stell dir einen Wald vor" und wir beide das malen – 
+        wir werden <em>komplett unterschiedliche</em> Bilder malen! <strong>Jeder Mensch "denkt" anders.</strong>
+      </p>
+      <p>KI hat <strong>keine eigenen Vorstellungen</strong>. Sie folgt nur deinen Anweisungen – je genauer du beschreibst, 
+      desto besser das Ergebnis. <strong>Gib SO VIELE Informationen wie möglich!</strong></p>
+    </div>
+    
+    <div class="en">
+      <p style="margin:15px 0;">AI is a <strong>series of work instructions</strong>. Imagine:</p>
+      <p style="margin:15px 0; padding:15px; background:white; border-radius:8px;">
+        <strong>The Forest Experiment:</strong> If I say "imagine a forest" and we both draw it – 
+        we'll draw <em>completely different</em> pictures! <strong>Every person "thinks" differently.</strong>
+      </p>
+      <p>AI has <strong>no imagination of its own</strong>. It only follows your instructions – the more precisely you describe, 
+      the better the result. <strong>Give AS MUCH information as possible!</strong></p>
+    </div>
+    
+    <div class="ar">
+      <p style="margin:15px 0;">الذكاء الاصطناعي هو <strong>سلسلة من تعليمات العمل</strong>. تخيل:</p>
+      <p style="margin:15px 0; padding:15px; background:white; border-radius:8px;">
+        <strong>تجربة الغابة:</strong> إذا قلت "تخيل غابة" ورسمنا كلانا ذلك – 
+        سنرسم صورًا <em>مختلفة تمامًا</em>! <strong>كل شخص "يفكر" بشكل مختلف.</strong>
+      </p>
+      <p>الذكاء الاصطناعي <strong>ليس لديه تصورات خاصة</strong>. إنه يتبع تعليماتك فقط – كلما وصفت بدقة أكبر، 
+      كانت النتيجة أفضل. <strong>قدم أكبر قدر ممكن من المعلومات!</strong></p>
+    </div>
+  </div>
+  
+  <div class="prompt-generator">
+    <h3 class="de">📝 Beschreibe deine Aufgabe</h3>
+    <h3 class="en">📝 Describe Your Task</h3>
+    <h3 class="ar">📝 صف مهمتك</h3>
+    
+    <label for="task-input">
+      <span class="de">Was brauchst du? (Je mehr Details, desto besser!)</span>
+      <span class="en">What do you need? (More details = better!)</span>
+      <span class="ar">ماذا تحتاج؟ (المزيد من التفاصيل = أفضل!)</span>
+    </label>
+    <textarea id="task-input" placeholder="z.B.: Ich muss ein Prüfprotokoll für die Elektroinstallation im 2. OG erstellen..."></textarea>
+    
+    <label for="task-type">
+      <span class="de">Art der Aufgabe:</span>
+      <span class="en">Type of Task:</span>
+      <span class="ar">نوع المهمة:</span>
+    </label>
+    <select id="task-type">
+      <option value="">-- Wählen / Select / اختر --</option>
+      <option value="protokoll">📋 Prüfprotokoll / Test Protocol / بروتوكول اختبار</option>
+      <option value="checkliste">✅ Checkliste / Checklist / قائمة مرجعية</option>
+      <option value="qm">📊 QM-Dokumentation / QM Documentation / وثائق الجودة</option>
+      <option value="bericht">📝 Bericht / Report / تقرير</option>
+      <option value="mangel">⚠️ Mängel / Defects / عيوب</option>
+      <option value="kalkulation">🔢 Kalkulation / Calculation / حساب</option>
+      <option value="email">✉️ E-Mail / Email / بريد إلكتروني</option>
+      <option value="recherche">🔍 Recherche / Research / بحث</option>
+      <option value="sonstiges">💡 Sonstiges / Other / أخرى</option>
+    </select>
+    
+    <button class="generate-btn" onclick="generatePrompt()">
+      <span class="de">✨ Optimierten Prompt generieren</span>
+      <span class="en">✨ Generate Optimized Prompt</span>
+      <span class="ar">✨ إنشاء مطالبة محسّنة</span>
+    </button>
+    
+    <div class="prompt-output" id="prompt-output">
+      <button class="copy-prompt-btn" onclick="copyGeneratedPrompt()">
+        <span class="de">📋 Prompt kopieren</span>
+        <span class="en">📋 Copy Prompt</span>
+        <span class="ar">📋 نسخ المطالبة</span>
+      </button>
+      <span class="copy-timestamp" id="copy-timestamp"></span>
+      
+      <div class="prompt-result-box">
+        <div class="prompt-result-text" id="generated-prompt"></div>
+      </div>
+      
+      <div class="ai-recommendation">
+        <h4 class="de">🤖 Empfohlene KI & Modell:</h4>
+        <h4 class="en">🤖 Recommended AI & Model:</h4>
+        <h4 class="ar">🤖 الذكاء الاصطناعي والنموذج الموصى به:</h4>
+        <div id="ai-recommendations"></div>
+        <p style="margin-top:15px; color:#a0aec0; font-size:0.9rem;">
+          <span class="de"><strong>So geht's:</strong> Prompt kopieren → Empfohlene KI öffnen → Prompt einfügen → Ggf. Dateien anhängen → Absenden</span>
+          <span class="en"><strong>How to:</strong> Copy prompt → Open recommended AI → Paste prompt → Attach files if needed → Submit</span>
+          <span class="ar"><strong>كيفية الاستخدام:</strong> نسخ المطالبة → فتح الذكاء الاصطناعي → لصق المطالبة → إرفاق الملفات إذا لزم → إرسال</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="de">🤔 Warum verschiedene KIs?</h2>
+  <h2 class="en">🤔 Why Different AIs?</h2>
+  <h2 class="ar">🤔 لماذا ذكاء اصطناعي مختلف؟</h2>
+  
+  <p class="de" style="margin-bottom:20px;">Wie Werkzeuge im Werkzeugkasten – jedes hat seine Stärke. <strong>Evidenzbasiert:</strong> Verschiedene KI-Modelle wurden für unterschiedliche Zwecke trainiert.</p>
+  <p class="en" style="margin-bottom:20px;">Like tools in a toolbox – each has its strength. <strong>Evidence-based:</strong> Different AI models were trained for different purposes.</p>
+  <p class="ar" style="margin-bottom:20px;">مثل الأدوات في صندوق الأدوات – لكل منها قوتها. <strong>قائم على الأدلة:</strong> تم تدريب نماذج مختلفة لأغراض مختلفة.</p>
+  
+  <div class="grid">
+    <div class="feature-card">
+      <div class="icon">🔧</div>
+      <h4>GitHub Copilot</h4>
+      <p class="de"><strong>Beste für:</strong> Technische Berechnungen, Tabellen</p>
+      <p class="en"><strong>Best for:</strong> Technical calculations, tables</p>
+      <p class="ar"><strong>الأفضل لـ:</strong> الحسابات التقنية والجداول</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💬</div>
+      <h4>ChatGPT (GPT-4o)</h4>
+      <p class="de"><strong>Beste für:</strong> E-Mails, Berichte, Texte</p>
+      <p class="en"><strong>Best for:</strong> Emails, reports, texts</p>
+      <p class="ar"><strong>الأفضل لـ:</strong> رسائل البريد والتقارير</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h4>Google Gemini</h4>
+      <p class="de"><strong>Beste für:</strong> Recherche, aktuelle Normen</p>
+      <p class="en"><strong>Best for:</strong> Research, current standards</p>
+      <p class="ar"><strong>الأفضل لـ:</strong> البحث والمعايير الحالية</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🚀</div>
+      <h4>Grok</h4>
+      <p class="de"><strong>Beste für:</strong> Realtime-Daten</p>
+      <p class="en"><strong>Best for:</strong> Real-time data</p>
+      <p class="ar"><strong>الأفضل لـ:</strong> البيانات الفورية</p>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="links">
+  <h2 class="de">🔗 Quick Links</h2>
+  <h2 class="en">🔗 Quick Links</h2>
+  <h2 class="ar">🔗 روابط سريعة</h2>
+  
+  <div class="info-box">
+    <strong class="de">💡 Repositories = Ordner für deine Projekte</strong>
+    <strong class="en">💡 Repositories = Folders for your projects</strong>
+    <strong class="ar">💡 المستودعات = مجلدات لمشاريعك</strong>
+    <br>
+    <span class="de">Wie OneDrive/Google Drive – Ein Repo pro Baustelle/Projekt!</span>
+    <span class="en">Like OneDrive/Google Drive – One repo per site/project!</span>
+    <span class="ar">مثل OneDrive/Google Drive – مستودع واحد لكل موقع/مشروع!</span>
+  </div>
+  
+  <div class="quick-links">
+    <a href="https://github.com/features/copilot" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🚀</span>
+      <span class="de">Copilot Pro Abo</span>
+      <span class="en">Copilot Pro Subscribe</span>
+      <span class="ar">اشتراك Copilot Pro</span>
+    </a>
+    <a href="https://github.com/settings/billing" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">❌</span>
+      <span class="de">Abo kündigen</span>
+      <span class="en">Cancel Subscription</span>
+      <span class="ar">إلغاء الاشتراك</span>
+    </a>
+    <a href="https://copilot.github.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">💬</span>
+      <span>Copilot Chat</span>
+    </a>
+    <a href="https://github.com/codespaces" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🤖</span>
+      <span class="de">Task Agent</span>
+      <span class="en">Task Agent</span>
+      <span class="ar">وكيل المهام</span>
+    </a>
+    <a href="https://github.com/new" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">📁</span>
+      <span class="de">Neues Repository</span>
+      <span class="en">New Repository</span>
+      <span class="ar">مستودع جديد</span>
+    </a>
+    <a href="https://chat.openai.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🧠</span>
+      <span>ChatGPT</span>
+    </a>
+    <a href="https://gemini.google.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🔍</span>
+      <span>Gemini</span>
+    </a>
+    <a href="https://grok.x.ai" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🚀</span>
+      <span>Grok (X.AI)</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>⚡ YamanAi – <span class="de">Dein KI-Assistent</span><span class="en">Your AI Assistant</span><span class="ar">مساعدك للذكاء الاصطناعي</span></p>
+  <p style="margin-top:10px;">100% Offline • <span class="de">Keine Datenübertragung</span><span class="en">No Data Transfer</span><span class="ar">لا نقل بيانات</span></p>
+  <p style="margin-top:15px; font-size:1rem;">
+    <strong>© 2025 Onkel Laith Habibi Produktions</strong>
+  </p>
+  <p style="margin-top:10px; opacity:0.7;" class="de">Mit 💜 für Yaman erstellt</p>
+  <p style="margin-top:10px; opacity:0.7;" class="en">Created with 💜 for Yaman</p>
+  <p style="margin-top:10px; opacity:0.7;" class="ar">تم الإنشاء بـ 💜 لـ يمن</p>
+</footer>
+
+</div>
+
+<script>
+function setLang(lang, e) {
+  document.body.className = 'show-' + lang;
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  if (e && e.target) {
+    e.target.classList.add('active');
+  }
+  localStorage.setItem('yamanai-lang', lang);
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var savedLang = localStorage.getItem('yamanai-lang') || 'de';
+  setLang(savedLang);
+});
+
+function generatePrompt() {
+  var taskInput = document.getElementById('task-input').value.trim();
+  var taskType = document.getElementById('task-type').value;
+  var currentLang = document.body.className.replace('show-', '');
+  
+  if (!taskInput) {
+    alert(currentLang === 'de' ? 'Bitte beschreibe deine Aufgabe!' : 
+          currentLang === 'en' ? 'Please describe your task!' : 'الرجاء وصف مهمتك!');
+    return;
+  }
+  
+  if (!taskType) {
+    alert(currentLang === 'de' ? 'Bitte wähle die Art der Aufgabe!' :
+          currentLang === 'en' ? 'Please select the type of task!' : 'الرجاء اختيار نوع المهمة!');
+    return;
+  }
+  
+  var aiRecs = {
+    'protokoll': { primary: { name: 'GitHub Copilot', model: 'GPT-4', url: 'https://copilot.github.com' },
+      secondary: [{ name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' }] },
+    'checkliste': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'GitHub Copilot', model: 'GPT-4', url: 'https://copilot.github.com' }] },
+    'qm': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'GitHub Copilot', model: 'GPT-4', url: 'https://copilot.github.com' }] },
+    'bericht': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'Gemini', model: 'Gemini 1.5 Pro', url: 'https://gemini.google.com' }] },
+    'mangel': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'GitHub Copilot', model: 'GPT-4', url: 'https://copilot.github.com' }] },
+    'kalkulation': { primary: { name: 'GitHub Copilot', model: 'GPT-4', url: 'https://copilot.github.com' },
+      secondary: [{ name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' }] },
+    'email': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'Gemini', model: 'Gemini 1.5 Pro', url: 'https://gemini.google.com' }] },
+    'recherche': { primary: { name: 'Google Gemini', model: 'Gemini 1.5 Pro', url: 'https://gemini.google.com' },
+      secondary: [{ name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' }] },
+    'sonstiges': { primary: { name: 'ChatGPT', model: 'GPT-4o', url: 'https://chat.openai.com' },
+      secondary: [{ name: 'Gemini', model: 'Gemini 1.5 Pro', url: 'https://gemini.google.com' }] }
+  };
+  
+  var prompt = 'Rolle: Du bist ein extrem sorgfältiger, wissenschaftlich arbeitender Assistent mit Fokus auf Evidenz, Normen/Regulatorik (DIN VDE) und klarer Struktur für Elektroingenieure.\n\n';
+  prompt += 'Ziel: Bearbeite meine Aufgabe vollständig, nachvollziehbar und auf dem aktuellsten Stand. Vermeide unbelegte Behauptungen.\n\n';
+  prompt += 'Muss-Kriterien (Qualität & Korrektheit):\n';
+  prompt += '- Evidenzbasiert: Jede wesentliche fachliche Aussage muss durch eine vertrauenswürdige Quelle gedeckt sein\n';
+  prompt += '- Keine Halluzinationen: Wenn etwas nicht sicher verifizierbar ist, markiere es ausdrücklich als „unklar"\n';
+  prompt += '- Aktualität: Prüfe bei zeitkritischen Themen den neuesten Stand (Normen, Gesetze, Zahlen)\n';
+  prompt += '- Quellenpflicht: Gib pro relevanter Aussage Quellen an (URL/DOI + Abrufdatum)\n';
+  prompt += '- Transparenz: Trenne strikt zwischen Fakten, Annahmen und Empfehlungen\n\n';
+  prompt += 'Vorgehen (Selbstprüfung in Iterationen):\n';
+  prompt += '- Iteration A – Fachlich: Definitionen, Zahlen, Mechanismen, Plausibilität, Vollständigkeit\n';
+  prompt += '- Iteration B – Recht/Normen: Relevante DIN VDE Normen prüfen und korrekt einordnen\n';
+  prompt += '- Iteration C – Struktur: Logischer Aufbau, klare Überschriften, Schritt-für-Schritt, keine Widersprüche\n\n';
+  prompt += 'Rückfragen-Regel: Wenn entscheidende Informationen fehlen, stelle zuerst gezielte Rückfragen. Antworte nicht „ins Blaue".\n\n';
+  prompt += 'Arbeitsmodus:\n';
+  prompt += '1) Beginne mit: „Was ich verstanden habe" (max. 5–10 Bulletpoints)\n';
+  prompt += '2) Liste danach: „Offene Punkte / Rückfragen" (nur die wirklich notwendigen)\n';
+  prompt += '3) Erst nach meiner Bestätigung lieferst du die vollständige Ausarbeitung\n\n';
+  prompt += 'Ausgabeformat (nach Bestätigung):\n';
+  prompt += '- Strukturierte Kapitel mit kurzen Zusammenfassungen\n';
+  prompt += '- Schritt-für-Schritt-Anleitung, wo sinnvoll\n';
+  prompt += '- Checkliste „Erledigt/Zu prüfen"\n';
+  prompt += '- Abschnitt „Risiken/Red Flags"\n';
+  prompt += '- Abschnitt „Quellen" (vollständig)\n\n';
+  prompt += '═══════════════════════════════════════\n';
+  prompt += 'MEINE AUFGABE:\n';
+  prompt += '═══════════════════════════════════════\n\n';
+  prompt += taskInput;
+  
+  document.getElementById('generated-prompt').textContent = prompt;
+  
+  var rec = aiRecs[taskType];
+  var recHtml = '<a href="' + rec.primary.url + '" target="_blank" rel="noopener" class="ai-badge recommended">✓ ' + rec.primary.name + ' (' + rec.primary.model + ')</a>';
+  for (var i = 0; i < rec.secondary.length; i++) {
+    recHtml += '<a href="' + rec.secondary[i].url + '" target="_blank" rel="noopener" class="ai-badge alternative">' + rec.secondary[i].name + ' (' + rec.secondary[i].model + ')</a>';
+  }
+  document.getElementById('ai-recommendations').innerHTML = recHtml;
+  
+  document.getElementById('prompt-output').classList.add('visible');
+  
+  var now = new Date();
+  var timestamp = now.toLocaleDateString('de-DE') + ' ' + now.toLocaleTimeString('de-DE');
+  var tsText = currentLang === 'de' ? 'Erstellt: ' : currentLang === 'en' ? 'Created: ' : 'تم الإنشاء: ';
+  document.getElementById('copy-timestamp').textContent = tsText + timestamp;
+  
+  document.getElementById('prompt-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyGeneratedPrompt() {
+  var text = document.getElementById('generated-prompt').textContent;
+  var btn = document.querySelector('.copy-prompt-btn');
+  var currentLang = document.body.className.replace('show-', '');
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showCopiedBtn(btn, currentLang);
+    }).catch(function() {
+      fallbackCopyPrompt(text, btn, currentLang);
+    });
+  } else {
+    fallbackCopyPrompt(text, btn, currentLang);
+  }
+}
+
+function fallbackCopyPrompt(text, btn, lang) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showCopiedBtn(btn, lang);
+  } catch (err) {
+    console.error('Copy failed:', err);
+  }
+  document.body.removeChild(textarea);
+}
+
+function showCopiedBtn(btn, lang) {
+  var copiedText = lang === 'de' ? '✓ Kopiert!' : lang === 'en' ? '✓ Copied!' : '✓ تم النسخ!';
+  var original = btn.innerHTML;
+  btn.innerHTML = copiedText;
+  btn.style.background = '#48bb78';
+  
+  var now = new Date();
+  var timestamp = now.toLocaleDateString('de-DE') + ' ' + now.toLocaleTimeString('de-DE');
+  var tsText = lang === 'de' ? 'Kopiert: ' : lang === 'en' ? 'Copied: ' : 'تم النسخ: ';
+  document.getElementById('copy-timestamp').textContent = tsText + timestamp;
+  
+  setTimeout(function() {
+    btn.innerHTML = original;
+    btn.style.background = '';
+  }, 2000);
+}
+</script>
+</body>
+</html>
