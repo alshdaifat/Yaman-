@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant Template Generator</title>
+<style>
+:root {
+  --primary: #667eea;
+  --secondary: #48bb78;
+  --warning: #ed8936;
+  --danger: #f56565;
+  --light: #f7fafc;
+  --dark: #1a202c;
+  --yellow: #ffd700;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.7;
+  color: var(--dark);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.hero {
+  text-align: center;
+  padding: 50px 28px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+}
+.hero h1 { font-size: 2.5rem; margin-bottom: 12px; }
+.hero .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 25px; }
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark);
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.generate-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, #805ad5 100%);
+  color: white;
+  border: none;
+  padding: 16px 35px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+.generate-btn:hover {
+  transform: translateY(-2px);
+}
+.output-section {
+  display: none;
+  margin-top: 30px;
+}
+.output-section.visible {
+  display: block;
+}
+.info-box {
+  background: #ebf8ff;
+  border-left: 4px solid var(--primary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.success-box {
+  background: #c6f6d5;
+  border-left: 4px solid var(--secondary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.download-btn {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 15px;
+}
+.download-btn:hover {
+  background: #38a169;
+}
+.preview-frame {
+  width: 100%;
+  height: 600px;
+  border: 2px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  margin-top: 15px;
+}
+h2 {
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  font-size: 1.6rem;
+}
+.profession-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+.profession-card {
+  background: var(--light);
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.profession-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
+.profession-card .icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="card hero">
+  <h1>🤖 AI Assistant Generator</h1>
+  <p class="subtitle">Erstelle eine maßgeschneiderte AI-Assistenten-Webseite für jeden Beruf</p>
+  <p style="opacity:0.85;">Personalisiert • Mehrsprachig • Offline-fähig</p>
+</div>
+
+<section class="card">
+  <h2>📝 Personalisierungsdaten eingeben</h2>
+  
+  <div class="info-box">
+    <strong>💡 So funktioniert's:</strong><br>
+    Fülle die untenstehenden Felder aus. Der Generator erstellt automatisch eine vollständige, 
+    personalisierte AI-Assistenten-Webseite im gleichen Design wie YamanAi – 
+    angepasst für den gewählten Beruf und die Person.
+  </div>
+
+  <form id="generator-form">
+    <div class="form-group">
+      <label for="person-name">👤 Name der Person</label>
+      <input type="text" id="person-name" placeholder="z.B. Sarah, Michael, Ahmed..." required>
+    </div>
+
+    <div class="form-group">
+      <label for="profession">💼 Beruf / Fachgebiet</label>
+      <input type="text" id="profession" placeholder="z.B. Architekt, Krankenschwester, Lehrer..." required>
+    </div>
+
+    <div class="form-group">
+      <label for="profession-area">🎯 Spezialisierung (optional)</label>
+      <input type="text" id="profession-area" placeholder="z.B. Hochbau, Intensivpflege, Grundschule...">
+    </div>
+
+    <div class="form-group">
+      <label>🔧 Häufige Aufgaben im Beruf (wähle 5-9 aus oder schreibe eigene)</label>
+      <div class="profession-examples" id="task-suggestions">
+        <!-- Will be populated by JavaScript -->
+      </div>
+      <textarea id="custom-tasks" placeholder="Oder beschreibe eigene Aufgaben (eine pro Zeile)..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="social-networks">🌐 Social Media / Kontakte</label>
+      <textarea id="social-networks" placeholder="LinkedIn: linkedin.com/in/username
+Twitter/X: @username
+GitHub: github.com/username
+Email: email@example.com"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="creator-name">✍️ Erstellt von (Name)</label>
+      <input type="text" id="creator-name" placeholder="z.B. Dein Name" required>
+    </div>
+
+    <div class="form-group">
+      <label for="languages">🌍 Sprachen (mehrere möglich)</label>
+      <div style="display: flex; gap: 15px; margin-top: 10px;">
+        <label><input type="checkbox" name="lang" value="de" checked> 🇩🇪 Deutsch</label>
+        <label><input type="checkbox" name="lang" value="en" checked> 🇬🇧 English</label>
+        <label><input type="checkbox" name="lang" value="ar"> 🇸🇦 العربية</label>
+        <label><input type="checkbox" name="lang" value="fr"> 🇫🇷 Français</label>
+        <label><input type="checkbox" name="lang" value="es"> 🇪🇸 Español</label>
+      </div>
+    </div>
+
+    <button type="submit" class="generate-btn">✨ AI-Assistenten generieren</button>
+  </form>
+
+  <div class="output-section" id="output-section">
+    <div class="success-box">
+      <strong>✅ Erfolgreich generiert!</strong><br>
+      Deine personalisierte AI-Assistenten-Webseite ist fertig.
+    </div>
+
+    <button class="download-btn" onclick="downloadHTML()">⬇️ HTML herunterladen</button>
+    <button class="download-btn" onclick="copyToClipboard()">📋 Code kopieren</button>
+
+    <h3 style="margin-top: 25px;">👁️ Vorschau:</h3>
+    <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts"></iframe>
+  </div>
+</section>
+
+<section class="card">
+  <h2>📖 Anleitung</h2>
+  
+  <div class="info-box">
+    <h4 style="margin-bottom: 10px;">So verwendest du den Generator:</h4>
+    <ol style="margin-left: 20px; margin-top: 10px;">
+      <li style="margin-bottom: 8px;"><strong>Personendaten eingeben:</strong> Name und Beruf der Person</li>
+      <li style="margin-bottom: 8px;"><strong>Aufgaben definieren:</strong> Typische Tätigkeiten im Beruf auswählen oder eigene eingeben</li>
+      <li style="margin-bottom: 8px;"><strong>Social Media hinzufügen:</strong> Kontakte und Profile (optional)</li>
+      <li style="margin-bottom: 8px;"><strong>Sprachen wählen:</strong> Mindestens eine, bis zu fünf Sprachen</li>
+      <li style="margin-bottom: 8px;"><strong>Generieren klicken:</strong> Die personalisierte Webseite wird erstellt</li>
+      <li style="margin-bottom: 8px;"><strong>Herunterladen:</strong> Als HTML-Datei speichern und verwenden</li>
+    </ol>
+  </div>
+
+  <h3>🎨 Was wird generiert?</h3>
+  <ul style="margin-left: 25px; margin-top: 10px;">
+    <li style="margin-bottom: 10px;">✨ <strong>Personalisierte Willkommensseite</strong> mit Namen und Beruf</li>
+    <li style="margin-bottom: 10px;">🎯 <strong>Intelligenter Prompt-Generator</strong> für berufsspezifische Aufgaben</li>
+    <li style="margin-bottom: 10px;">🤖 <strong>AI-Empfehlungen</strong> basierend auf Aufgabentyp</li>
+    <li style="margin-bottom: 10px;">🌍 <strong>Mehrsprachige Oberfläche</strong> mit sofortigem Sprachwechsel</li>
+    <li style="margin-bottom: 10px;">🔗 <strong>Quick Links</strong> zu AI-Tools und Social Media</li>
+    <li style="margin-bottom: 10px;">📚 <strong>Lernmaterial</strong> über AI-Nutzung</li>
+    <li style="margin-bottom: 10px;">💾 <strong>100% Offline-fähig</strong> – keine externe Abhängigkeiten</li>
+  </ul>
+</section>
+
+</div>
+
+<script>
+// Task suggestions based on profession
+const professionTasks = {
+  'architekt': ['Projektplanung', 'Baugenehmigung', 'Kostenberechnung', 'Präsentation', 'Bauüberwachung', 'Zeichnungen', 'Materialliste', 'Kundenbriefe', 'Recherche Bauvorschriften'],
+  'lehrer': ['Unterrichtsplanung', 'Prüfungserstellung', 'Elternbriefe', 'Lernmaterial', 'Bewertung', 'Dokumentation', 'Präsentationen', 'Recherche', 'Feedback'],
+  'krankenschwester': ['Pflegedokumentation', 'Patienteninfo', 'Schichtplanung', 'Medikamentenplan', 'Checkliste', 'Protokoll', 'Bericht', 'Anleitung', 'Notfallplan'],
+  'ingenieur': ['Prüfprotokoll', 'Berechnung', 'Dokumentation', 'Technischer Bericht', 'Präsentation', 'Checkliste', 'Anleitung', 'Email', 'Recherche'],
+  'anwalt': ['Vertragsaufsatz', 'Schriftsatz', 'Recherche', 'Mandantenbrief', 'Checkliste', 'Protokoll', 'Gutachten', 'Präsentation', 'Aktenvermerk']
+};
+
+document.getElementById('generator-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  generateAssistant();
+});
+
+function generateAssistant() {
+  const personName = document.getElementById('person-name').value;
+  const profession = document.getElementById('profession').value;
+  const professionArea = document.getElementById('profession-area').value;
+  const customTasks = document.getElementById('custom-tasks').value;
+  const socialNetworks = document.getElementById('social-networks').value;
+  const creatorName = document.getElementById('creator-name').value;
+  
+  const selectedLangs = Array.from(document.querySelectorAll('input[name="lang"]:checked')).map(cb => cb.value);
+  
+  if (selectedLangs.length === 0) {
+    alert('Bitte wähle mindestens eine Sprache aus!');
+    return;
+  }
+
+  // Parse tasks
+  const tasks = customTasks.split('\n').filter(t => t.trim()).slice(0, 9);
+  
+  // Generate HTML
+  const html = generateHTML(personName, profession, professionArea, tasks, socialNetworks, creatorName, selectedLangs);
+  
+  // Show output
+  document.getElementById('output-section').classList.add('visible');
+  
+  // Update preview
+  const iframe = document.getElementById('preview-frame');
+  iframe.srcdoc = html;
+  
+  // Store for download
+  window.generatedHTML = html;
+  window.generatedFileName = `${personName.toLowerCase().replace(/\s+/g, '-')}-ai-assistant.html`;
+}
+
+function generateHTML(name, profession, area, tasks, social, creator, langs) {
+  const displayName = area ? `${profession} (${area})` : profession;
+  
+  // Build task options
+  let taskOptions = '';
+  tasks.forEach((task, i) => {
+    taskOptions += `      <option value="task${i}">${task}</option>\n`;
+  });
+  
+  // Build language toggle
+  let langButtons = '';
+  langs.forEach((lang, i) => {
+    const langNames = {de: '🇩🇪 Deutsch', en: '🇬🇧 English', ar: '🇸🇦 العربية', fr: '🇫🇷 Français', es: '🇪🇸 Español'};
+    const active = i === 0 ? ' active' : '';
+    langButtons += `    <button class="lang-btn${active}" onclick="setLang('${lang}', event)">${langNames[lang]}</button>\n`;
+  });
+  
+  // Social links
+  let socialLinks = '';
+  if (social) {
+    social.split('\n').forEach(line => {
+      const match = line.match(/^([^:]+):\s*(.+)$/);
+      if (match) {
+        const platform = match[1].trim();
+        const url = match[2].trim();
+        socialLinks += `    <a href="${url.startsWith('http') ? url : 'https://' + url}" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🔗</span>
+      <span>${platform}</span>
+    </a>\n`;
+      }
+    });
+  }
+
+  return `<!DOCTYPE html>
+<html lang="${langs[0]}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${name}AI – KI-Assistent für ${displayName}</title>
+<style>
+:root {
+  --primary: #667eea;
+  --secondary: #48bb78;
+  --warning: #ed8936;
+  --danger: #f56565;
+  --light: #f7fafc;
+  --dark: #1a202c;
+  --yellow: #ffd700;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.7;
+  color: var(--dark);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.hero {
+  text-align: center;
+  padding: 50px 28px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+}
+.hero h1 { font-size: 2.5rem; margin-bottom: 12px; }
+.hero .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 25px; }
+.lang-toggle {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.lang-btn {
+  padding: 10px 25px;
+  border: 2px solid var(--primary);
+  background: white;
+  color: var(--primary);
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.lang-btn.active, .lang-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+.prompt-generator {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 25px 0;
+}
+.prompt-generator h3 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+.prompt-generator label {
+  color: #a0aec0;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.prompt-generator textarea,
+.prompt-generator select {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  background: #2d3748;
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  font-family: inherit;
+}
+.prompt-generator textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.generate-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, #805ad5 100%);
+  color: white;
+  border: none;
+  padding: 16px 35px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+.generate-btn:hover {
+  transform: translateY(-2px);
+}
+.prompt-output {
+  display: none;
+  margin-top: 25px;
+}
+.prompt-output.visible { display: block; }
+.prompt-result-box {
+  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+  border: 4px solid var(--yellow);
+  border-radius: 12px;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(255,215,0,0.3);
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+  50% { box-shadow: 0 0 40px rgba(255,215,0,0.5); }
+}
+.prompt-result-box::before {
+  content: "★ ★ ★";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--yellow);
+  color: #9b2c2c;
+  padding: 4px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+.prompt-result-text {
+  color: white;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-prompt-btn {
+  position: sticky;
+  top: 20px;
+  background: var(--yellow);
+  color: #1a202c;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px auto;
+  font-size: 1rem;
+  transition: all 0.2s;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.copy-prompt-btn:hover {
+  background: #f6e05e;
+  transform: scale(1.02);
+}
+.info-box {
+  background: #ebf8ff;
+  border-left: 4px solid var(--primary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+.quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 15px;
+  background: var(--light);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--dark);
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+.quick-link:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.quick-link .icon { font-size: 2rem; margin-bottom: 10px; }
+.quick-link span { font-weight: 600; text-align: center; }
+h2 {
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  font-size: 1.6rem;
+}
+footer {
+  text-align: center;
+  padding: 25px;
+  color: white;
+  font-size: 0.95rem;
+  margin-top: 25px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="card hero">
+  <h1>⚡ ${name}AI</h1>
+  <p class="subtitle">KI-Assistent für ${displayName}</p>
+  <p style="opacity:0.85;">Weniger Aufwand. Mehr Zeit für dich. 💜</p>
+  
+  <div class="lang-toggle">
+${langButtons}
+  </div>
+</div>
+
+<section class="card">
+  <h2>🎯 Intelligenter Prompt Generator</h2>
+  
+  <div class="info-box">
+    <strong>💡 Tipp:</strong> Je mehr Details du gibst, desto besser die AI-Antwort!
+  </div>
+  
+  <div class="prompt-generator">
+    <h3>📝 Beschreibe deine Aufgabe</h3>
+    
+    <label for="task-input">Was brauchst du?</label>
+    <textarea id="task-input" placeholder="Beschreibe deine Aufgabe so detailliert wie möglich..."></textarea>
+    
+    <label for="task-type">Art der Aufgabe:</label>
+    <select id="task-type">
+      <option value="">-- Bitte wählen --</option>
+${taskOptions}
+    </select>
+    
+    <button class="generate-btn" onclick="generatePrompt()">✨ Optimierten Prompt generieren</button>
+    
+    <div class="prompt-output" id="prompt-output">
+      <button class="copy-prompt-btn" onclick="copyPrompt()">📋 Prompt kopieren</button>
+      
+      <div class="prompt-result-box">
+        <div class="prompt-result-text" id="generated-prompt"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>🔗 Quick Links</h2>
+  
+  <div class="quick-links">
+    <a href="https://copilot.github.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">💬</span>
+      <span>Copilot Chat</span>
+    </a>
+    <a href="https://chat.openai.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🧠</span>
+      <span>ChatGPT</span>
+    </a>
+    <a href="https://gemini.google.com" target="_blank" rel="noopener" class="quick-link">
+      <span class="icon">🔍</span>
+      <span>Gemini</span>
+    </a>
+${socialLinks}
+  </div>
+</section>
+
+<footer>
+  <p>⚡ ${name}AI – KI-Assistent für ${displayName}</p>
+  <p style="margin-top:10px;">100% Offline • Keine Datenübertragung</p>
+  <p style="margin-top:15px; font-size:1rem;">
+    <strong>© 2025 ${creator}</strong>
+  </p>
+  <p style="margin-top:10px; opacity:0.7;">
+    Mit 💜 für ${name} erstellt
+  </p>
+</footer>
+
+</div>
+
+<script>
+function setLang(lang, e) {
+  // Language switching placeholder
+  if (e && e.target) {
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+}
+
+function generatePrompt() {
+  const taskInput = document.getElementById('task-input').value.trim();
+  const taskType = document.getElementById('task-type').value;
+  
+  if (!taskInput || !taskType) {
+    alert('Bitte fülle beide Felder aus!');
+    return;
+  }
+  
+  const prompt = \`Rolle: Du bist ein extrem sorgfältiger, wissenschaftlich arbeitender Assistent mit Fokus auf Evidenz, Normen/Regulatorik und klarer Struktur für ${displayName}.
+
+Ziel: Bearbeite meine Aufgabe vollständig, nachvollziehbar und auf dem aktuellsten Stand. Vermeide unbelegte Behauptungen.
+
+Muss-Kriterien (Qualität & Korrektheit):
+- Evidenzbasiert: Jede wesentliche fachliche Aussage muss durch eine vertrauenswürdige Quelle gedeckt sein
+- Keine Halluzinationen: Wenn etwas nicht sicher verifizierbar ist, markiere es ausdrücklich als „unklar"
+- Aktualität: Prüfe bei zeitkritischen Themen den neuesten Stand
+- Quellenpflicht: Gib pro relevanter Aussage Quellen an (URL/DOI + Abrufdatum)
+- Transparenz: Trenne strikt zwischen Fakten, Annahmen und Empfehlungen
+
+Vorgehen (Selbstprüfung in Iterationen):
+- Iteration A – Fachlich: Definitionen, Zahlen, Mechanismen, Plausibilität, Vollständigkeit
+- Iteration B – Recht/Normen: Relevante Gesetze/Normen/Leitlinien prüfen und korrekt einordnen
+- Iteration C – Struktur: Logischer Aufbau, klare Überschriften, Schritt-für-Schritt, keine Widersprüche
+
+Rückfragen-Regel: Wenn entscheidende Informationen fehlen, stelle zuerst gezielte Rückfragen.
+
+Arbeitsmodus:
+1) Beginne mit: „Was ich verstanden habe" (max. 5–10 Bulletpoints)
+2) Liste danach: „Offene Punkte / Rückfragen"
+3) Erst nach meiner Bestätigung lieferst du die vollständige Ausarbeitung
+
+Ausgabeformat (nach Bestätigung):
+- Strukturierte Kapitel mit kurzen Zusammenfassungen
+- Schritt-für-Schritt-Anleitung, wo sinnvoll
+- Checkliste „Erledigt/Zu prüfen"
+- Abschnitt „Risiken/Red Flags"
+- Abschnitt „Quellen" (vollständig)
+
+═══════════════════════════════════════
+MEINE AUFGABE:
+═══════════════════════════════════════
+
+\${taskInput}\`;
+  
+  document.getElementById('generated-prompt').textContent = prompt;
+  document.getElementById('prompt-output').classList.add('visible');
+  document.getElementById('prompt-output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyPrompt() {
+  const text = document.getElementById('generated-prompt').textContent;
+  const btn = document.querySelector('.copy-prompt-btn');
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      const original = btn.innerHTML;
+      btn.innerHTML = '✓ Kopiert!';
+      btn.style.background = '#48bb78';
+      setTimeout(function() {
+        btn.innerHTML = original;
+        btn.style.background = '';
+      }, 2000);
+    });
+  }
+}
+</script>
+</body>
+</html>`;
+}
+
+function downloadHTML() {
+  const blob = new Blob([window.generatedHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = window.generatedFileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyToClipboard() {
+  navigator.clipboard.writeText(window.generatedHTML).then(() => {
+    alert('✅ HTML-Code in Zwischenablage kopiert!');
+  });
+}
+</script>
+</body>
+</html>

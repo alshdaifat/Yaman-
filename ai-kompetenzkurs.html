@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Kompetenzkurs - Prompt Writing & Chatbot-Anbieter</title>
+<style>
+:root {
+  --primary: #667eea;
+  --secondary: #48bb78;
+  --warning: #ed8936;
+  --danger: #f56565;
+  --light: #f7fafc;
+  --dark: #1a202c;
+  --yellow: #ffd700;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.7;
+  color: var(--dark);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.hero {
+  text-align: center;
+  padding: 50px 28px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: "🎓";
+  position: absolute;
+  font-size: 200px;
+  opacity: 0.05;
+  right: -30px;
+  top: -30px;
+}
+.hero h1 { font-size: 2.5rem; margin-bottom: 12px; }
+.hero .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 25px; }
+h2 {
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  font-size: 1.6rem;
+}
+h3 { color: var(--dark); margin: 22px 0 12px; font-size: 1.25rem; }
+.info-box {
+  background: #ebf8ff;
+  border-left: 4px solid var(--primary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.warning-box {
+  background: #fefcbf;
+  border-left: 4px solid var(--warning);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.success-box {
+  background: #c6f6d5;
+  border-left: 4px solid var(--secondary);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.danger-box {
+  background: #fed7d7;
+  border-left: 4px solid var(--danger);
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 0 12px 12px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+.comparison-table th,
+.comparison-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+.comparison-table tr:hover {
+  background: var(--light);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 25px 0;
+}
+.feature-card {
+  background: var(--light);
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s;
+}
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.feature-card h4 {
+  color: var(--primary);
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+.feature-card .icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+.prompt-example {
+  background: #2d3748;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 15px 0;
+  position: relative;
+}
+.prompt-example::before {
+  content: "Beispiel-Prompt";
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  background: var(--secondary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-family: system-ui;
+}
+.dos-donts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+.dos {
+  background: #c6f6d5;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  padding: 20px;
+}
+.donts {
+  background: #fed7d7;
+  border: 2px solid var(--danger);
+  border-radius: 12px;
+  padding: 20px;
+}
+.dos h4, .donts h4 {
+  margin-bottom: 15px;
+}
+ul { margin-left: 25px; margin-bottom: 18px; }
+li { margin-bottom: 10px; }
+.steps {
+  counter-reset: step;
+}
+.step {
+  position: relative;
+  padding-left: 55px;
+  margin-bottom: 22px;
+}
+.step::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  line-height: 40px;
+  text-align: center;
+}
+.nav {
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.nav-links a {
+  color: var(--primary);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.nav-links a:hover {
+  background: var(--light);
+}
+footer {
+  text-align: center;
+  padding: 25px;
+  color: white;
+  font-size: 0.95rem;
+  margin-top: 25px;
+}
+@media (max-width: 768px) {
+  .dos-donts { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="card hero">
+  <h1>🎓 AI Kompetenzkurs</h1>
+  <p class="subtitle">Lerne, wie du AI-Chatbots richtig nutzt und effektive Prompts schreibst</p>
+  <p style="opacity:0.85;">Praktisch • Verständlich • Sofort anwendbar</p>
+</div>
+
+<nav class="card nav">
+  <div class="nav-links">
+    <a href="#grundlagen">📚 Grundlagen</a>
+    <a href="#prompt-writing">✍️ Prompt Writing</a>
+    <a href="#manus-ai">🤖 manus.ai</a>
+    <a href="#anbieter">🌐 Anbieter-Vergleich</a>
+    <a href="#praxis">🎯 Praxistipps</a>
+  </div>
+</nav>
+
+<!-- GRUNDLAGEN -->
+<section class="card" id="grundlagen">
+  <h2>📚 Grundlagen: Was ist AI wirklich?</h2>
+  
+  <div class="info-box">
+    <h4>🧠 Wichtig zu verstehen:</h4>
+    <p><strong>AI ist KEIN Mensch!</strong> AI ist eine <strong>Reihe von Arbeitsanweisungen</strong>, die Text verarbeitet.</p>
+  </div>
+
+  <h3>Das Wald-Experiment</h3>
+  <div class="warning-box">
+    <p><strong>Stell dir vor:</strong> Ich sage "Stell dir einen Wald vor" und wir beide malen das.</p>
+    <p style="margin-top:10px;">🌲 Du siehst vielleicht einen deutschen Mischwald.</p>
+    <p>🌴 Ich sehe vielleicht einen tropischen Regenwald.</p>
+    <p style="margin-top:10px;"><strong>→ Komplett unterschiedliche Bilder!</strong> So "denkt" auch jeder Mensch anders.</p>
+  </div>
+
+  <h3>Was bedeutet das für AI?</h3>
+  <ul>
+    <li>✅ AI hat <strong>keine eigenen Vorstellungen</strong></li>
+    <li>✅ AI folgt nur <strong>deinen Anweisungen</strong></li>
+    <li>✅ Je genauer du beschreibst, desto besser das Ergebnis</li>
+    <li>✅ <strong>Mehr Details = Bessere AI-Antwort</strong></li>
+  </ul>
+
+  <h3>Wie AI funktioniert (vereinfacht)</h3>
+  <div class="grid">
+    <div class="feature-card">
+      <div class="icon">📥</div>
+      <h4>1. Eingabe</h4>
+      <p>Dein Prompt (Text) wird verarbeitet</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🧮</div>
+      <h4>2. Verarbeitung</h4>
+      <p>AI analysiert Muster aus Trainingsdaten</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎲</div>
+      <h4>3. Vorhersage</h4>
+      <p>AI berechnet wahrscheinlichste Antwort</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📤</div>
+      <h4>4. Ausgabe</h4>
+      <p>Du erhältst die generierte Antwort</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROMPT WRITING -->
+<section class="card" id="prompt-writing">
+  <h2>✍️ Die Kunst des Prompt Writing</h2>
+
+  <div class="success-box">
+    <strong>🎯 Grundregel:</strong> Ein guter Prompt ist wie eine klare Aufgabenstellung an einen Mitarbeiter.
+  </div>
+
+  <h3>Die 5 Elemente eines perfekten Prompts</h3>
+  
+  <div class="steps">
+    <div class="step">
+      <h4>Rolle definieren</h4>
+      <p><strong>"Du bist ein..."</strong> – Sage der AI, welche Rolle sie einnehmen soll.</p>
+      <p style="margin-top:8px; color:#666;">Beispiel: "Du bist ein erfahrener Architekt mit 15 Jahren Berufserfahrung."</p>
+    </div>
+    
+    <div class="step">
+      <h4>Kontext geben</h4>
+      <p><strong>Hintergrundinformationen</strong> – Was ist die Situation?</p>
+      <p style="margin-top:8px; color:#666;">Beispiel: "Ich plane ein Einfamilienhaus in Bayern, Baurecht gilt nach Bayerischer Bauordnung."</p>
+    </div>
+    
+    <div class="step">
+      <h4>Aufgabe stellen</h4>
+      <p><strong>Was soll gemacht werden?</strong> – Sei so spezifisch wie möglich.</p>
+      <p style="margin-top:8px; color:#666;">Beispiel: "Erstelle eine Checkliste für die Baugenehmigung mit allen erforderlichen Unterlagen."</p>
+    </div>
+    
+    <div class="step">
+      <h4>Format angeben</h4>
+      <p><strong>Wie soll die Antwort aussehen?</strong> – Definiere das Ausgabeformat.</p>
+      <p style="margin-top:8px; color:#666;">Beispiel: "Strukturiere die Antwort als nummerierte Liste mit Erklärungen."</p>
+    </div>
+    
+    <div class="step">
+      <h4>Qualitätskriterien</h4>
+      <p><strong>Was ist wichtig?</strong> – Setze Anforderungen an die Qualität.</p>
+      <p style="margin-top:8px; color:#666;">Beispiel: "Nenne zu jedem Punkt die rechtliche Grundlage (Paragraf) und Quellen."</p>
+    </div>
+  </div>
+
+  <h3>✅ Guter Prompt vs. ❌ Schlechter Prompt</h3>
+  
+  <div class="dos-donts">
+    <div class="dos">
+      <h4>✅ Gutes Beispiel</h4>
+      <div style="background:white; padding:15px; border-radius:8px; margin-top:10px; font-size:0.9rem;">
+        <strong>Prompt:</strong><br>
+        "Du bist ein Elektroingenieur mit Expertise in DIN VDE Normen. Erstelle mir ein Prüfprotokoll für die Elektroinstallation einer 3-Zimmer-Wohnung (80m²) im 2. OG eines Mehrfamilienhauses. Das Protokoll soll alle Prüfpunkte nach DIN VDE 0100-600 enthalten, als Tabelle formatiert sein mit Spalten: Prüfpunkt, Norm, Soll-Wert, Ist-Wert, Bestanden/Nicht bestanden. Füge Unterschriftenfelder für Prüfer und Bauherr hinzu."
+      </div>
+      <p style="margin-top:15px; font-size:0.9rem;"><strong>Warum gut?</strong> Rolle, Kontext, spezifische Aufgabe, Format und Details klar definiert.</p>
+    </div>
+    
+    <div class="donts">
+      <h4>❌ Schlechtes Beispiel</h4>
+      <div style="background:white; padding:15px; border-radius:8px; margin-top:10px; font-size:0.9rem;">
+        <strong>Prompt:</strong><br>
+        "Mach mir ein Prüfprotokoll für Elektrik."
+      </div>
+      <p style="margin-top:15px; font-size:0.9rem;"><strong>Warum schlecht?</strong> Keine Rolle, kein Kontext, vage Aufgabe, kein Format, keine Anforderungen. AI muss zu viel raten!</p>
+    </div>
+  </div>
+
+  <h3>📝 Prompt-Vorlage zum Kopieren</h3>
+  
+  <div class="prompt-example">
+Rolle: Du bist ein extrem sorgfältiger, wissenschaftlich arbeitender Assistent mit Fokus auf Evidenz und klarer Struktur.
+
+Kontext: [Beschreibe deine Situation, z.B. "Ich arbeite als Architekt an einem Bürogebäude-Projekt"]
+
+Aufgabe: [Was soll gemacht werden? z.B. "Erstelle eine Kostenschätzung für die Elektroinstallation"]
+
+Format: [Wie soll die Antwort aussehen? z.B. "Als Tabelle mit Positionen, Menge, Einzelpreis, Gesamtpreis"]
+
+Qualitätskriterien:
+- Evidenzbasiert: Gib Quellen an
+- Aktuell: Nutze neueste Standards/Normen
+- Vollständig: Vergiss keine wichtigen Aspekte
+- Strukturiert: Klare Gliederung mit Überschriften
+
+Arbeitsmodus:
+1) Beginne mit: "Was ich verstanden habe" (Bulletpoints)
+2) Liste "Offene Fragen"
+3) Warte auf meine Bestätigung
+4) Dann: Vollständige Ausarbeitung
+  </div>
+</section>
+
+<!-- MANUS.AI -->
+<section class="card" id="manus-ai">
+  <h2>🤖 manus.ai – Spezialist für wissenschaftliches Schreiben</h2>
+
+  <div class="info-box">
+    <strong>Was ist manus.ai?</strong><br>
+    manus.ai ist ein AI-Tool speziell für <strong>wissenschaftliches und akademisches Schreiben</strong>. 
+    Es hilft beim Verfassen von Papers, Berichten und Forschungsdokumenten.
+  </div>
+
+  <h3>🎯 Wofür ist manus.ai geeignet?</h3>
+  <div class="grid">
+    <div class="feature-card">
+      <div class="icon">📄</div>
+      <h4>Wissenschaftliche Paper</h4>
+      <p>Forschungsarbeiten, Abstracts, Literaturübersichten</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📊</div>
+      <h4>Technische Berichte</h4>
+      <p>Dokumentationen, Analysen, Gutachten</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📚</div>
+      <h4>Literaturverwaltung</h4>
+      <p>Zitationen, Quellenangaben, Bibliographien</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">✏️</div>
+      <h4>Textüberarbeitung</h4>
+      <p>Grammatik, Stil, akademische Sprache</p>
+    </div>
+  </div>
+
+  <h3>🔑 Hauptfunktionen von manus.ai</h3>
+  <ul>
+    <li><strong>Literature Search:</strong> Findet relevante wissenschaftliche Quellen</li>
+    <li><strong>Citation Management:</strong> Verwaltet Zitate und Referenzen automatisch</li>
+    <li><strong>Writing Assistant:</strong> Hilft beim Formulieren akademischer Texte</li>
+    <li><strong>Plagiarism Check:</strong> Überprüft Originalität</li>
+    <li><strong>Formatting:</strong> Formatiert nach wissenschaftlichen Standards (APA, IEEE, etc.)</li>
+  </ul>
+
+  <div class="warning-box">
+    <strong>⚠️ Wichtig:</strong> manus.ai ist <strong>NICHT</strong> für alltägliche Aufgaben wie E-Mails, 
+    Checklisten oder einfache Texte geeignet. Nutze dafür ChatGPT oder Copilot.
+  </div>
+
+  <h3>💡 Wann manus.ai verwenden?</h3>
+  <div class="success-box">
+    <strong>✅ Verwende manus.ai wenn:</strong>
+    <ul style="margin-top:10px; margin-left:20px;">
+      <li>Du eine wissenschaftliche Arbeit schreibst</li>
+      <li>Du viele Quellen zitieren musst</li>
+      <li>Du akademische Sprache brauchst</li>
+      <li>Du nach spezifischer Fachliteratur suchst</li>
+    </ul>
+  </div>
+
+  <div class="danger-box">
+    <strong>❌ Verwende NICHT manus.ai für:</strong>
+    <ul style="margin-top:10px; margin-left:20px;">
+      <li>Alltägliche E-Mails</li>
+      <li>Einfache Checklisten</li>
+      <li>Soziale Medien Posts</li>
+      <li>Programmcode</li>
+      <li>Geschäftsbriefe</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ANBIETER-VERGLEICH -->
+<section class="card" id="anbieter">
+  <h2>🌐 AI-Chatbot Anbieter im Vergleich</h2>
+
+  <div class="info-box">
+    <strong>🎯 Die Wahrheit:</strong> Es gibt NICHT "den besten" AI-Chatbot. 
+    Jeder hat Stärken und Schwächen. Wähle das richtige Tool für die richtige Aufgabe!
+  </div>
+
+  <h3>Übersichtstabelle</h3>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Anbieter</th>
+        <th>Modell</th>
+        <th>Beste für</th>
+        <th>Kosten</th>
+        <th>Sprachen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>GitHub Copilot</strong></td>
+        <td>GPT-4</td>
+        <td>Code, Technische Docs, Berechnungen</td>
+        <td>10€/Monat</td>
+        <td>Alle</td>
+      </tr>
+      <tr>
+        <td><strong>ChatGPT</strong></td>
+        <td>GPT-4o</td>
+        <td>Texte, E-Mails, Allgemein</td>
+        <td>20€/Monat</td>
+        <td>Alle</td>
+      </tr>
+      <tr>
+        <td><strong>ChatGPT Free</strong></td>
+        <td>GPT-4o-mini</td>
+        <td>Einfache Aufgaben, Lernen</td>
+        <td>Kostenlos</td>
+        <td>Alle</td>
+      </tr>
+      <tr>
+        <td><strong>Claude (Anthropic)</strong></td>
+        <td>Claude 3.5 Sonnet</td>
+        <td>Lange Texte, Analyse, Ethik</td>
+        <td>20€/Monat</td>
+        <td>Englisch++</td>
+      </tr>
+      <tr>
+        <td><strong>Google Gemini</strong></td>
+        <td>Gemini 1.5 Pro</td>
+        <td>Recherche, Aktuelle Infos</td>
+        <td>20€/Monat</td>
+        <td>Alle</td>
+      </tr>
+      <tr>
+        <td><strong>Grok (X.AI)</strong></td>
+        <td>Grok Beta</td>
+        <td>Twitter/X, Realtime, Trends</td>
+        <td>16€/Monat</td>
+        <td>Englisch</td>
+      </tr>
+      <tr>
+        <td><strong>manus.ai</strong></td>
+        <td>Eigenes Modell</td>
+        <td>Wissenschaftliche Arbeiten</td>
+        <td>Variiert</td>
+        <td>Englisch</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>🔬 Detaillierter Vergleich</h3>
+
+  <div class="feature-card" style="margin-bottom:20px;">
+    <div class="icon">🔧</div>
+    <h4>GitHub Copilot (GPT-4)</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Programmcode schreiben und debuggen</li>
+      <li>Technische Berechnungen</li>
+      <li>Tabellenverarbeitung</li>
+      <li>Integration mit VS Code und IDEs</li>
+      <li>Versteht Programmiersprachen perfekt</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Nicht ideal für lange, kreative Texte</li>
+      <li>Weniger gut für Marketing/Social Media</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> Prüfprotokolle, Excel-Formeln, Kalkulationen, Code</p>
+  </div>
+
+  <div class="feature-card" style="margin-bottom:20px;">
+    <div class="icon">💬</div>
+    <h4>ChatGPT (GPT-4o)</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Natürliche, menschliche Sprache</li>
+      <li>Kreative Texte und Geschichten</li>
+      <li>E-Mails und Geschäftsbriefe</li>
+      <li>Übersetzungen</li>
+      <li>Erklärungen und Bildung</li>
+      <li>Breites Allgemeinwissen</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Keine aktuellen Informationen (Cutoff)</li>
+      <li>Kein Internet-Zugriff (Standard)</li>
+      <li>Manchmal zu "höflich" und ausschweifend</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> E-Mails, Berichte, Präsentationen, Lernen</p>
+  </div>
+
+  <div class="feature-card" style="margin-bottom:20px;">
+    <div class="icon">🧠</div>
+    <h4>Claude 3.5 Sonnet (Anthropic)</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Sehr lange Texte (200.000 Tokens!)</li>
+      <li>Tiefgehende Analysen</li>
+      <li>Ethische Überlegungen</li>
+      <li>Weniger "Halluzinationen"</li>
+      <li>Kann ganze Bücher verarbeiten</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Etwas langsamer</li>
+      <li>Weniger bekannt = weniger Community Support</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> Lange Dokumente analysieren, Gutachten, Ethik-Fragen</p>
+  </div>
+
+  <div class="feature-card" style="margin-bottom:20px;">
+    <div class="icon">🔍</div>
+    <h4>Google Gemini (Gemini 1.5 Pro)</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Zugriff auf Google Suche</li>
+      <li>Aktuelle Informationen</li>
+      <li>Faktencheck möglich</li>
+      <li>Multimodal (Text + Bilder + Video)</li>
+      <li>Integration mit Google Workspace</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Noch in Entwicklung, weniger ausgereift</li>
+      <li>Manchmal inkonsistente Antworten</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> Recherche, aktuelle Normen/Gesetze, Fakten prüfen</p>
+  </div>
+
+  <div class="feature-card" style="margin-bottom:20px;">
+    <div class="icon">🚀</div>
+    <h4>Grok (X.AI - Elon Musk)</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Echtzeit-Zugriff auf Twitter/X</li>
+      <li>Aktuelle Trends und News</li>
+      <li>Weniger "politisch korrekt"</li>
+      <li>Humor und Sarkasmus</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Nur in Englisch wirklich gut</li>
+      <li>Benötigt X Premium+</li>
+      <li>Noch Beta, manchmal fehlerhaft</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> Social Media Trends, aktuelle Ereignisse, Twitter-Analysen</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="icon">📄</div>
+    <h4>manus.ai</h4>
+    <p><strong>Stärken:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>Spezialisiert auf wissenschaftliches Schreiben</li>
+      <li>Literatursuche und -verwaltung</li>
+      <li>Korrekte Zitationen</li>
+      <li>Akademischer Schreibstil</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Schwächen:</strong></p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li>NICHT für alltägliche Aufgaben</li>
+      <li>Nur Englisch</li>
+      <li>Kostenpflichtig</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>💡 Nutze für:</strong> Papers, Dissertationen, wissenschaftliche Berichte</p>
+  </div>
+</section>
+
+<!-- PRAXISTIPPS -->
+<section class="card" id="praxis">
+  <h2>🎯 Praxistipps: Welche AI für welche Aufgabe?</h2>
+
+  <h3>🏗️ Für Architekten</h3>
+  <ul>
+    <li><strong>Baugenehmigung:</strong> ChatGPT (Checklisten, Briefe)</li>
+    <li><strong>Kostenberechnung:</strong> GitHub Copilot (Excel-Formeln, Tabellen)</li>
+    <li><strong>Recherche Baurecht:</strong> Google Gemini (aktuelle Gesetze)</li>
+    <li><strong>Präsentation:</strong> ChatGPT (Text) + Copilot (Struktur)</li>
+  </ul>
+
+  <h3>⚡ Für Elektroingenieure</h3>
+  <ul>
+    <li><strong>Prüfprotokoll:</strong> GitHub Copilot (technische Struktur)</li>
+    <li><strong>DIN VDE Recherche:</strong> Google Gemini (aktuelle Normen)</li>
+    <li><strong>Kundenkommunikation:</strong> ChatGPT (E-Mails, Berichte)</li>
+    <li><strong>Berechnungen:</strong> GitHub Copilot (Formeln)</li>
+  </ul>
+
+  <h3>🩺 Für Ärzte/Krankenpflege</h3>
+  <ul>
+    <li><strong>Patienteninfo:</strong> ChatGPT (verständliche Sprache)</li>
+    <li><strong>Fachliteratur:</strong> manus.ai (wissenschaftliche Quellen)</li>
+    <li><strong>Medikamenten-Info:</strong> Google Gemini (aktuelle Daten)</li>
+    <li><strong>Dokumentation:</strong> ChatGPT (strukturiert)</li>
+  </ul>
+
+  <h3>⚖️ Für Juristen</h3>
+  <ul>
+    <li><strong>Vertragsaufsatz:</strong> Claude (lange Texte, Präzision)</li>
+    <li><strong>Gesetzesrecherche:</strong> Google Gemini (aktuell)</li>
+    <li><strong>Mandantenbriefe:</strong> ChatGPT (höflich, klar)</li>
+    <li><strong>Gutachten:</strong> Claude (Tiefgang, Ethik)</li>
+  </ul>
+
+  <h3>🎓 Für Studierende/Forschende</h3>
+  <ul>
+    <li><strong>Paper schreiben:</strong> manus.ai (wissenschaftlich)</li>
+    <li><strong>Literaturübersicht:</strong> Google Gemini + manus.ai</li>
+    <li><strong>Zusammenfassungen:</strong> ChatGPT</li>
+    <li><strong>Code für Forschung:</strong> GitHub Copilot</li>
+  </ul>
+
+  <div class="success-box" style="margin-top:30px;">
+    <h4>💡 Profi-Tipp: Kombiniere mehrere AIs!</h4>
+    <p style="margin-top:10px;">Nutze z.B.:</p>
+    <ul style="margin-left:20px; margin-top:8px;">
+      <li><strong>Gemini</strong> für Recherche → aktuelle Infos sammeln</li>
+      <li><strong>ChatGPT</strong> für Struktur → Text formulieren</li>
+      <li><strong>Claude</strong> für Review → Qualität prüfen</li>
+    </ul>
+    <p style="margin-top:12px;"><strong>Ergebnis:</strong> Beste Qualität durch Kombination der Stärken!</p>
+  </div>
+</section>
+
+<!-- CHECKLISTE -->
+<section class="card">
+  <h2>✅ Zusammenfassung: Deine Checkliste</h2>
+
+  <div class="steps">
+    <div class="step">
+      <h4>AI verstehen</h4>
+      <p>✅ AI ist KEINE Person, sondern folgt Anweisungen</p>
+      <p>✅ Mehr Details = Bessere Ergebnisse</p>
+    </div>
+
+    <div class="step">
+      <h4>Gute Prompts schreiben</h4>
+      <p>✅ Rolle, Kontext, Aufgabe, Format, Qualität definieren</p>
+      <p>✅ Nutze die Prompt-Vorlage von oben</p>
+    </div>
+
+    <div class="step">
+      <h4>Richtiges Tool wählen</h4>
+      <p>✅ Copilot = Technik/Code</p>
+      <p>✅ ChatGPT = Texte/Allgemein</p>
+      <p>✅ Gemini = Recherche/Aktuell</p>
+      <p>✅ Claude = Lange Analysen</p>
+      <p>✅ manus.ai = Wissenschaft</p>
+    </div>
+
+    <div class="step">
+      <h4>Qualität prüfen</h4>
+      <p>✅ Immer Quellen überprüfen</p>
+      <p>✅ AI-Ausgaben nie blind kopieren</p>
+      <p>✅ Fachliches Wissen anwenden</p>
+    </div>
+
+    <div class="step">
+      <h4>Iterieren & Verbessern</h4>
+      <p>✅ Erste Antwort oft nicht perfekt</p>
+      <p>✅ Nachfragen stellen</p>
+      <p>✅ Prompt verfeinern</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>🎓 AI Kompetenzkurs – Lerne AI richtig nutzen</p>
+  <p style="margin-top:10px;">© 2025 Onkel Laith Habibi Produktions</p>
+  <p style="margin-top:10px; opacity:0.7;">Mit 💜 erstellt für besseres AI-Verständnis</p>
+</footer>
+
+</div>
+</body>
+</html>
